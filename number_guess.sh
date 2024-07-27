@@ -28,3 +28,21 @@ fi
 echo "Guess the secret number between 1 and 1000:"
 
 GUESSES=0
+while true; do
+    read GUESS
+    if ! [[ $GUESS =~ ^[0-9]+$ ]]; then
+        echo "That is not an integer, guess again:"
+        continue
+    else
+        GUESSES=$((GUESSES + 1))
+    fi
+    if [ $GUESS -lt $RANDOM_NUMBER ]; then
+        echo "It's higher than that, guess again:"
+    elif [ $GUESS -gt $RANDOM_NUMBER ]; then
+        echo "It's lower than that, guess again:"
+    else
+        echo "You guessed it in $GUESSES tries. The secret number was $RANDOM_NUMBER. Nice job!"
+        run_psql "INSERT INTO games (username, guesses) VALUES ('$USERNAME', $GUESSES);" 2>&1 >/dev/null
+        exit
+    fi
+done
